@@ -2,14 +2,6 @@ import styled from "styled-components";
 
 export const Podcasts = styled.section`
   --color-primary: #2b6cb6;
-
-  h2 {
-    color: var(--color-primary);
-  }
-
-  hr {
-    width: 100%;
-  }
 `;
 
 export const Filter = styled.div`
