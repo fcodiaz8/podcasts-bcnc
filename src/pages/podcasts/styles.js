@@ -9,6 +9,7 @@ export const Filter = styled.div`
   justify-content: flex-end;
   align-items: center;
   gap: 1rem;
+  margin-bottom: 2rem;
 
   p {
     color: white;
@@ -35,7 +36,7 @@ export const Filter = styled.div`
 export const PodcastsGrid = styled.div`
   display: grid;
   grid-template-columns: repeat(4, auto);
-  gap: 5rem 2rem;
+  gap: 3rem 2rem;
   width: 100%;
   box-sizing: content-box;
 `;

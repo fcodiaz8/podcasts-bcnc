@@ -11,9 +11,13 @@ export const PodcastCard = ({ data }) => {
 
   return (
     <S.PodcastCard>
-      <img src={avatar} alt={name} />
-      <p className="podcast-name">{name.toUpperCase()}</p>
-      <p>Author: {artist}</p>
+      <div className="podcast-image">
+        <img src={avatar} alt={name} />
+      </div>
+      <div className="podcast-textdata">
+        <p className="podcast-name">{name.toUpperCase()}</p>
+        <p>Author: {artist}</p>
+      </div>
     </S.PodcastCard>
   );
 };
