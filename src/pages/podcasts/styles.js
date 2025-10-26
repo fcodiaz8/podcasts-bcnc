@@ -31,3 +31,11 @@ export const Filter = styled.div`
     outline: none;
   }
 `;
+
+export const PodcastsGrid = styled.div`
+  display: grid;
+  grid-template-columns: repeat(4, auto);
+  gap: 5rem 2rem;
+  width: 100%;
+  box-sizing: content-box;
+`;
