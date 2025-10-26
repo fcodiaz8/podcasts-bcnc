@@ -2,7 +2,6 @@ import * as S from "./styles";
 import { useEffect, useState } from "react";
 import { useOutletContext } from "react-router-dom";
 import { PodcastCard } from "../../components/PodcastCard";
-import MOCK_PODCASTS_DATA from "../../mocks/podcasts.json";
 
 export const Podcasts = () => {
   const { setIsLoading } = useOutletContext();
@@ -11,12 +10,21 @@ export const Podcasts = () => {
   useEffect(() => {
     setIsLoading(true);
 
-    const timeout = setTimeout(() => {
-      setPodcasts(MOCK_PODCASTS_DATA.feed.entry);
-      setIsLoading(false);
-    }, 3000);
+    const fetchPodcasts = async () => {
+      try {
+        const res = await fetch(
+          "https://itunes.apple.com/us/rss/toppodcasts/limit=100/genre=1310/json"
+        );
+        const data = await res.json();
+        setPodcasts(data.feed.entry);
+      } catch (error) {
+        console.error("Error al cargar podcasts:", error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
 
-    return () => clearTimeout(timeout);
+    fetchPodcasts();
   }, [setIsLoading]);
 
   return (
