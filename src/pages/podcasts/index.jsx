@@ -1,14 +1,23 @@
 import * as S from "./styles";
 import { useEffect, useState } from "react";
+import { useOutletContext } from "react-router-dom";
 import { PodcastCard } from "../../components/PodcastCard";
-import PODCASTS_DATA from "../../mocks/podcasts.json";
+import MOCK_PODCASTS_DATA from "../../mocks/podcasts.json";
 
 export const Podcasts = () => {
+  const { setIsLoading } = useOutletContext();
   const [podcasts, setPodcasts] = useState([]);
 
   useEffect(() => {
-    setPodcasts(PODCASTS_DATA.feed.entry);
-  }, []);
+    setIsLoading(true);
+
+    const timeout = setTimeout(() => {
+      setPodcasts(MOCK_PODCASTS_DATA.feed.entry);
+      setIsLoading(false);
+    }, 3000);
+
+    return () => clearTimeout(timeout);
+  }, [setIsLoading]);
 
   return (
     <S.Podcasts>
