@@ -15,7 +15,7 @@
 body {
   margin: 0;
   display: flex;
-  min-width: 100vw;
+  min-width: 100%;
   min-height: 100vh;
 }
 
@@ -28,4 +28,5 @@ p {
   width: 100%;
   margin: 0;
   padding: 2rem;
+  box-sizing: border-box;
 }
