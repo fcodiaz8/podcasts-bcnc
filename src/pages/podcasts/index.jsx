@@ -6,6 +6,7 @@ import { PodcastCard } from "../../components/PodcastCard";
 export const Podcasts = () => {
   const { setIsLoading } = useOutletContext();
   const [podcasts, setPodcasts] = useState([]);
+  const [filteredPodcasts, setFilteredPodcasts] = useState([]);
 
   useEffect(() => {
     setIsLoading(true);
@@ -17,6 +18,7 @@ export const Podcasts = () => {
         );
         const data = await res.json();
         setPodcasts(data.feed.entry);
+        setFilteredPodcasts(data.feed.entry);
       } catch (error) {
         console.error("Error al cargar podcasts:", error);
       } finally {
@@ -27,18 +29,38 @@ export const Podcasts = () => {
     fetchPodcasts();
   }, [setIsLoading]);
 
+  const handleChangeFilter = (e) => {
+    const filterValue = e.target.value.toLowerCase();
+
+    const newPodcasts = podcasts.filter(
+      (p) =>
+        p["im:name"].label.toLowerCase().includes(filterValue) ||
+        p["im:artist"].label.toLowerCase().includes(filterValue)
+    );
+
+    setFilteredPodcasts(newPodcasts);
+  };
+
   return (
     <S.Podcasts>
       <S.Filter>
-        <p>100</p>
-        <input type="text" placeholder="Filter podcasts..." id="filter" />
+        <p>{filteredPodcasts.length}</p>
+        <input
+          id="filter"
+          type="text"
+          placeholder="Filter podcasts..."
+          onChange={handleChangeFilter}
+        />
       </S.Filter>
 
       <S.PodcastsGrid>
-        {podcasts.map((p, index) => (
+        {filteredPodcasts.map((p, index) => (
           <PodcastCard key={index} data={p} />
         ))}
       </S.PodcastsGrid>
+      {filteredPodcasts.length === 0 && (
+        <p>Ningún resultado para este filtro.</p>
+      )}
     </S.Podcasts>
   );
 };

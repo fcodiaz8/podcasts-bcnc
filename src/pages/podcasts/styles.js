@@ -2,6 +2,10 @@ import styled from "styled-components";
 
 export const Podcasts = styled.section`
   --color-primary: #2b6cb6;
+
+  p {
+    text-align: center;
+  }
 `;
 
 export const Filter = styled.div`
@@ -35,8 +39,8 @@ export const Filter = styled.div`
 
 export const PodcastsGrid = styled.div`
   display: grid;
-  grid-template-columns: repeat(4, auto);
+  grid-template-columns: repeat(4, 1fr);
   gap: 3rem 2rem;
   width: 100%;
-  box-sizing: content-box;
+  box-sizing: border-box;
 `;
