@@ -17,9 +17,9 @@ export const Layout = styled.div`
     a:hover {
       color: #0033dd;
     }
+  }
 
-    hr {
-      width: 100%;
-    }
+  hr {
+    border: 1px solid #ddd;
   }
 `;

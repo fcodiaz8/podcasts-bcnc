@@ -17,9 +17,13 @@ body {
   display: flex;
   min-width: 100%;
   min-height: 100vh;
+
+  max-width: 600px;
+  margin: 0 auto;
 }
 
-p {
+p,
+h2 {
   margin: 0;
   padding: 0;
 }
