@@ -1,6 +1,6 @@
 import * as S from "./styles";
 import { useEffect, useState } from "react";
-import { useOutletContext } from "react-router-dom";
+import { Link, useOutletContext } from "react-router-dom";
 import { PodcastCard } from "../../components/PodcastCard";
 
 export const Podcasts = () => {
@@ -55,10 +55,12 @@ export const Podcasts = () => {
 
       <S.PodcastsGrid>
         {filteredPodcasts.map((p, index) => (
-          <PodcastCard key={index} data={p} />
+          <Link key={index} to={`/podcast/${p.id.attributes["im:id"]}`}>
+            <PodcastCard data={p} />
+          </Link>
         ))}
       </S.PodcastsGrid>
-      {filteredPodcasts.length === 0 && (
+      {podcasts.length > 0 && filteredPodcasts.length === 0 && (
         <p>Ningún resultado para este filtro.</p>
       )}
     </S.Podcasts>

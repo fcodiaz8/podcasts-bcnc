@@ -43,4 +43,9 @@ export const PodcastsGrid = styled.div`
   gap: 3rem 2rem;
   width: 100%;
   box-sizing: border-box;
+
+  a {
+    text-decoration: none;
+    color: inherit;
+  }
 `;
