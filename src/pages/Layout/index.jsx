@@ -1,10 +1,10 @@
-import { useState } from "react";
 import * as S from "./styles";
 import { Outlet, Link } from "react-router-dom";
 import { Loader } from "../../components/Loader";
+import { useGlobalLoading } from "../../hooks/useGlobalLoading.js";
 
 export const Layout = () => {
-  const [isLoading, setIsLoading] = useState(false);
+  const { isLoading } = useGlobalLoading();
 
   return (
     <S.Layout>
@@ -17,7 +17,7 @@ export const Layout = () => {
       <hr />
 
       <main>
-        <Outlet context={{ setIsLoading }} />
+        <Outlet />
       </main>
     </S.Layout>
   );

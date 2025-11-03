@@ -1,15 +1,16 @@
 import * as S from "./styles";
 import { useEffect, useState } from "react";
-import { Link, useOutletContext } from "react-router-dom";
+import { Link } from "react-router-dom";
+import { useGlobalLoading } from "../../hooks/useGlobalLoading";
 import { PodcastCard } from "../../components/PodcastCard";
 
 export const Podcasts = () => {
-  const { setIsLoading } = useOutletContext();
   const [podcasts, setPodcasts] = useState([]);
   const [filteredPodcasts, setFilteredPodcasts] = useState([]);
+  const { showLoading, hideLoading } = useGlobalLoading();
 
   useEffect(() => {
-    setIsLoading(true);
+    showLoading();
 
     const fetchPodcasts = async () => {
       try {
@@ -22,12 +23,12 @@ export const Podcasts = () => {
       } catch (error) {
         console.error("Error al cargar podcasts:", error);
       } finally {
-        setIsLoading(false);
+        hideLoading();
       }
     };
 
     fetchPodcasts();
-  }, [setIsLoading]);
+  }, [showLoading, hideLoading]);
 
   const handleChangeFilter = (e) => {
     const filterValue = e.target.value.toLowerCase();
@@ -61,7 +62,7 @@ export const Podcasts = () => {
         ))}
       </S.PodcastsGrid>
       {podcasts.length > 0 && filteredPodcasts.length === 0 && (
-        <p>Ningún resultado para este filtro.</p>
+        <p>No results for this filter.</p>
       )}
     </S.Podcasts>
   );

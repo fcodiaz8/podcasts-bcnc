@@ -1,17 +1,19 @@
 import { useEffect, useState } from "react";
 import * as S from "./styles";
-import { Link, useOutletContext, useParams } from "react-router-dom";
-import { PodcastInfo } from "../../components/PodcastDescription";
+import { Link, useParams } from "react-router-dom";
+import { PodcastInfo } from "../../components/PodcastInfo/index.jsx";
+import { useGlobalLoading } from "../../hooks/useGlobalLoading.js";
 
 export const Podcast = () => {
-  const { setIsLoading } = useOutletContext();
   const { podcastId } = useParams();
   const [podcastData, setPodcastData] = useState({});
+  const { showLoading, hideLoading, isLoading } = useGlobalLoading();
 
   useEffect(() => {
-    setIsLoading(true);
+    let cancelled = false;
+    showLoading();
 
-    const fetchPodcasts = async () => {
+    const fetchEpisodes = async () => {
       try {
         const res = await fetch(
           `https://api.allorigins.win/get?url=${encodeURIComponent(
@@ -21,23 +23,41 @@ export const Podcast = () => {
         const data = await res.json();
         const jsonData = JSON.parse(data.contents.trim());
         setPodcastData(jsonData);
-        console.log(jsonData); ///tmp
       } catch (error) {
         console.error("Error al cargar podcast:", error);
       } finally {
-        setIsLoading(false);
+        if (!cancelled) hideLoading();
       }
     };
 
-    fetchPodcasts();
-  }, [setIsLoading, podcastId]);
+    fetchEpisodes();
+
+    return () => {
+      cancelled = true;
+      hideLoading();
+    };
+  }, [podcastId, showLoading, hideLoading]);
 
   const podcastInfo = podcastData.resultCount ? podcastData.results[0] : {};
-  const avatar = podcastInfo.artworkUrl600 ?? "-";
-  const title = podcastInfo.collectionName ?? "-";
-  const author = podcastInfo.artistName ?? "-";
+  const avatar = podcastInfo.artworkUrl600;
+  const title = podcastInfo.collectionName;
+  const author = podcastInfo.artistName;
   const description = podcastInfo.description ?? "-";
   const episodes = podcastData.resultCount ? podcastData.results.slice(1) : [];
+
+  const formatDuration = (trackTimeMillis) => {
+    const totalSeconds = Math.floor(trackTimeMillis / 1000);
+    const hours = Math.floor(totalSeconds / 3600);
+    const minutes = Math.floor((totalSeconds % 3600) / 60)
+      .toString()
+      .padStart(2, "0");
+    const seconds = (totalSeconds % 60).toString().padStart(2, "0");
+
+    const formattedTrackTime = hours
+      ? `${hours}:${minutes}:${seconds}`
+      : `${minutes}:${seconds}`;
+    return formattedTrackTime;
+  };
 
   return (
     <S.Podcast>
@@ -47,11 +67,12 @@ export const Podcast = () => {
           title={title}
           author={author}
           description={description}
+          podcastId={podcastId}
         />
       </div>
       <div className="episodes">
         <div className="episodes-count">
-          <h2>Episodes: 66</h2>
+          <h2>Episodes: {isLoading ? "..." : podcastData.resultCount - 1}</h2>
         </div>
         <div className="episodes-titles">
           <table>
@@ -68,30 +89,33 @@ export const Podcast = () => {
               </tr>
             </thead>
             <tbody>
-              {episodes.map((e) => {
-                const date = new Date(e.releaseDate);
-                const formattedDate = date.toLocaleDateString("es-ES");
+              {isLoading && (
+                <tr>
+                  <td>...</td>
+                  <td>...</td>
+                  <td>...</td>
+                </tr>
+              )}
+              {!isLoading &&
+                episodes.map((e) => {
+                  const date = new Date(e.releaseDate);
+                  const formattedDate = date.toLocaleDateString("es-ES");
+                  const formattedDuration = formatDuration(e.trackTimeMillis);
 
-                const totalSeconds = Math.floor(e.trackTimeMillis / 1000);
-                const minutes = Math.floor(totalSeconds / 60);
-                const seconds = totalSeconds % 60;
-                const formattedTrackTime = `${minutes}:${seconds
-                  .toString()
-                  .padStart(2, "0")}`;
-                return (
-                  <tr key={e.trackId}>
-                    <td>
-                      <Link
-                        to={`/podcast/${e.collectionId}/episode/${e.trackId}`}
-                      >
-                        {e.trackName}
-                      </Link>
-                    </td>
-                    <td>{formattedDate}</td>
-                    <td>{formattedTrackTime}</td>
-                  </tr>
-                );
-              })}
+                  return (
+                    <tr key={e.trackId}>
+                      <td>
+                        <Link
+                          to={`/podcast/${e.collectionId}/episode/${e.trackId}`}
+                        >
+                          {e.trackName}
+                        </Link>
+                      </td>
+                      <td>{formattedDate}</td>
+                      <td>{formattedDuration}</td>
+                    </tr>
+                  );
+                })}
             </tbody>
           </table>
         </div>
