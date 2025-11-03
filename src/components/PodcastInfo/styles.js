@@ -2,6 +2,7 @@ import styled from "styled-components";
 
 export const PodcastInfo = styled.div`
   padding: 1rem;
+  min-height: 10rem;
 
   border: 1px solid lightgrey;
   border-top: 1px solid #eee;
@@ -19,5 +20,10 @@ export const PodcastInfo = styled.div`
 
   hr {
     border: 1px solid #ddd;
+  }
+
+  a {
+    text-decoration: none;
+    color: inherit;
   }
 `;
