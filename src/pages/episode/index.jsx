@@ -1,74 +1,26 @@
-import { useEffect, useState } from "react";
 import * as S from "./styles";
 import DOMPurify from "dompurify";
 import { useParams } from "react-router-dom";
 import { PodcastInfo } from "../../components/PodcastInfo";
-import { useGlobalLoading } from "../../hooks/useGlobalLoading";
+import { useFetchPodcast } from "../../hooks/useFetchPodcast";
 
 export const Episode = () => {
   const { podcastId, episodeId } = useParams();
-  const [podcastData, setPodcastData] = useState({});
-  const [summaryPodcast, setSummaryPodcast] = useState("");
-  const { showLoading, hideLoading } = useGlobalLoading();
+  const { podcast, episodes } = useFetchPodcast({ podcastId });
 
-  useEffect(() => {
-    showLoading();
+  const episode =
+    episodes?.results?.find((p) => p.trackId.toString() === episodeId) || {};
 
-    const fetchEpisodes = async () => {
-      try {
-        const res = await fetch(
-          `https://api.allorigins.win/get?url=${encodeURIComponent(
-            `https://itunes.apple.com/lookup?id=${podcastId}&media=podcast&entity=podcastEpisode&limit=20`
-          )}`
-        );
-        const data = await res.json();
-        const jsonData = JSON.parse(data.contents.trim());
-        setPodcastData(jsonData);
-      } catch (error) {
-        console.error("Error al cargar podcast:", error);
-      } finally {
-        hideLoading();
-      }
-    };
-
-    const fetchPodcasts = async () => {
-      try {
-        const res = await fetch(
-          "https://itunes.apple.com/us/rss/toppodcasts/limit=100/genre=1310/json"
-        );
-        const data = await res.json();
-        const thisPodcast = data.feed.entry.find(
-          (p) => p.id.attributes["im:id"] === podcastId
-        );
-        setSummaryPodcast(thisPodcast.summary?.label);
-      } catch (error) {
-        console.error("Error al cargar podcasts:", error);
-      } finally {
-        hideLoading();
-      }
-    };
-
-    fetchEpisodes();
-    fetchPodcasts();
-  }, [podcastId, showLoading, hideLoading]);
-
-  const podcastInfo = podcastData.resultCount ? podcastData.results[0] : {};
-  const avatar = podcastInfo.artworkUrl600;
-  const title = podcastInfo.collectionName;
-  const author = podcastInfo.artistName;
-
-  const podcast =
-    podcastData.results?.find((p) => p.trackId.toString() === episodeId) || {};
-  const { trackName, description: epidodeDescription, episodeUrl } = podcast;
+  const { trackName, description: epidodeDescription, episodeUrl } = episode;
 
   return (
     <S.Podcast>
       <div className="info">
         <PodcastInfo
-          avatar={avatar}
-          title={title}
-          author={author}
-          description={summaryPodcast}
+          avatar={podcast.avatar}
+          title={podcast.title}
+          author={podcast.author}
+          description={podcast.description}
           podcastId={podcastId}
         />
       </div>

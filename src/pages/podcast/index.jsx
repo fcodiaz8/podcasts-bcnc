@@ -1,78 +1,31 @@
-import { useEffect, useState } from "react";
 import * as S from "./styles";
 import { Link, useParams } from "react-router-dom";
 import { PodcastInfo } from "../../components/PodcastInfo/index.jsx";
 import { useGlobalLoading } from "../../hooks/useGlobalLoading.js";
+import { useFetchPodcast } from "../../hooks/useFetchPodcast.js";
+import { formatDuration } from "../../utils/formatDuration.js";
 
 export const Podcast = () => {
   const { podcastId } = useParams();
-  const [podcastData, setPodcastData] = useState({});
-  const { showLoading, hideLoading, isLoading } = useGlobalLoading();
-
-  useEffect(() => {
-    let cancelled = false;
-    showLoading();
-
-    const fetchEpisodes = async () => {
-      try {
-        const res = await fetch(
-          `https://api.allorigins.win/get?url=${encodeURIComponent(
-            `https://itunes.apple.com/lookup?id=${podcastId}&media=podcast&entity=podcastEpisode&limit=20`
-          )}`
-        );
-        const data = await res.json();
-        const jsonData = JSON.parse(data.contents.trim());
-        setPodcastData(jsonData);
-      } catch (error) {
-        console.error("Error al cargar podcast:", error);
-      } finally {
-        if (!cancelled) hideLoading();
-      }
-    };
-
-    fetchEpisodes();
-
-    return () => {
-      cancelled = true;
-      hideLoading();
-    };
-  }, [podcastId, showLoading, hideLoading]);
-
-  const podcastInfo = podcastData.resultCount ? podcastData.results[0] : {};
-  const avatar = podcastInfo.artworkUrl600;
-  const title = podcastInfo.collectionName;
-  const author = podcastInfo.artistName;
-  const description = podcastInfo.description ?? "-";
-  const episodes = podcastData.resultCount ? podcastData.results.slice(1) : [];
-
-  const formatDuration = (trackTimeMillis) => {
-    const totalSeconds = Math.floor(trackTimeMillis / 1000);
-    const hours = Math.floor(totalSeconds / 3600);
-    const minutes = Math.floor((totalSeconds % 3600) / 60)
-      .toString()
-      .padStart(2, "0");
-    const seconds = (totalSeconds % 60).toString().padStart(2, "0");
-
-    const formattedTrackTime = hours
-      ? `${hours}:${minutes}:${seconds}`
-      : `${minutes}:${seconds}`;
-    return formattedTrackTime;
-  };
+  const { isLoading } = useGlobalLoading();
+  const { podcast, episodes } = useFetchPodcast({ podcastId });
+  const episodesData = episodes?.results?.slice(1) ?? [];
 
   return (
     <S.Podcast>
       <div className="info">
         <PodcastInfo
-          avatar={avatar}
-          title={title}
-          author={author}
-          description={description}
+          avatar={podcast.avatar}
+          title={podcast.title}
+          author={podcast.author}
+          description={podcast.description}
           podcastId={podcastId}
         />
       </div>
+
       <div className="episodes">
         <div className="episodes-count">
-          <h2>Episodes: {isLoading ? "..." : podcastData.resultCount - 1}</h2>
+          <h2>Episodes: {isLoading ? "..." : episodes.resultCount - 1}</h2>
         </div>
         <div className="episodes-titles">
           <table>
@@ -97,7 +50,7 @@ export const Podcast = () => {
                 </tr>
               )}
               {!isLoading &&
-                episodes.map((e) => {
+                episodesData.map((e) => {
                   const date = new Date(e.releaseDate);
                   const formattedDate = date.toLocaleDateString("es-ES");
                   const formattedDuration = formatDuration(e.trackTimeMillis);
