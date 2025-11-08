@@ -9,7 +9,8 @@ export const Podcast = () => {
   const { podcastId } = useParams();
   const { isLoading } = useGlobalLoading();
   const { podcast, episodes } = useFetchPodcast({ podcastId });
-  const episodesData = episodes?.results?.slice(1) ?? [];
+  const { resultCount, results = [] } = episodes;
+  const episodesData = results.slice(1);
 
   return (
     <S.Podcast>
@@ -25,7 +26,7 @@ export const Podcast = () => {
 
       <div className="episodes">
         <div className="episodes-count">
-          <h2>Episodes: {isLoading ? "..." : episodes.resultCount - 1}</h2>
+          <h2>Episodes: {isLoading ? "..." : resultCount - 1}</h2>
         </div>
         <div className="episodes-titles">
           <table>
